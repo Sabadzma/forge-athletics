@@ -1,9 +1,10 @@
 import react from '@astrojs/react';
 import { conlocaCMS } from '@conloca/astro-cms/node';
+import { conlocaCloud } from '@conloca/cloud-astro';
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://forge-athletics.example',
+  site: 'https://forge-athletics-eight-roan.vercel.app',
   trailingSlash: 'never',
   integrations: [
     react(),
@@ -23,6 +24,14 @@ export default defineConfig({
           },
         },
       },
+    }),
+    conlocaCloud({
+      endpoint: 'https://app.conloca.com',
+      puckConfigPath: './src/puck.config.tsx',
+      publicBaseUrl: 'https://forge-athletics-eight-roan.vercel.app',
+      siteStyles: './src/styles/global.css',
+      previewBuild: false,
+      requireRegistration: true,
     }),
   ],
 });

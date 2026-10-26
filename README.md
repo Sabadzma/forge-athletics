@@ -45,7 +45,7 @@ The intended content mapping is:
 - **Data collections:** services, trainers, membership plans, journal articles, classes, schedules, and recurring metrics.
 - **Media:** photography stored in `public/images` and managed through the Media Library.
 
-Hosted Conloca Cloud registration is not configured yet. It requires the real Vercel production URL and the user-managed build token; no live registration is claimed.
+Hosted Conloca Cloud is configured for `https://app.conloca.com` and the production deployment at `https://forge-athletics-eight-roan.vercel.app`. Registration runs only on pushed CI/Vercel builds with `CONLOCA_BUILD_TOKEN` configured. Local development does not require the token; local production builds do because `requireRegistration` is enabled.
 
 ## Forms and scheduling
 
