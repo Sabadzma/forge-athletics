@@ -1,0 +1,50 @@
+---
+import Icon from './Icon.astro';
+import type { Plan } from '../data/gym';
+interface Props { plan: Plan; }
+const { plan } = Astro.props;
+const annualTotal = plan.annualMonthlyPrice * 12;
+const annualSavings = (plan.monthlyPrice - plan.annualMonthlyPrice) * 12;
+---
+<article class:list={['plan-card', { 'plan-card--featured': plan.featured }]}>
+  {plan.featured && <span class="plan-card__badge">Most popular</span>}
+  <div class="plan-card__head">
+    <h3>{plan.name}</h3>
+    <p>{plan.description}</p>
+  </div>
+  <div class="plan-card__price">
+    <span class="plan-card__currency">$</span>
+    <strong data-price data-monthly={plan.monthlyPrice} data-annual={plan.annualMonthlyPrice}>{plan.monthlyPrice}</strong>
+    <span class="plan-card__period">/ month</span>
+  </div>
+  <p class="plan-card__billing" data-billing-note data-annual-total={annualTotal} data-annual-savings={annualSavings}>Billed monthly · cancel anytime</p>
+  <a class:list={['button', 'button--full', plan.featured ? 'button--lime' : 'button--dark']} href={`/contact?plan=${plan.slug}`}>Choose {plan.name}<Icon name="arrow-up-right" size={17} class="icon--arrow" /></a>
+  <ul class="check-list plan-card__features">
+    {plan.features.map((feature) => <li><Icon name="check" size={17} /><span>{feature}</span></li>)}
+  </ul>
+</article>
+
+<style>
+  .plan-card { position: relative; display: flex; min-width: 0; flex-direction: column; padding: clamp(26px, 3vw, 38px); border: 1px solid var(--line); background: var(--white); }
+  .plan-card--featured { border-color: var(--ink); background: var(--ink); color: var(--white); box-shadow: var(--shadow); }
+  .plan-card__badge { position: absolute; top: 0; right: 28px; padding: 8px 12px; background: var(--lime); color: var(--ink); font-size: 0.6rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; transform: translateY(-50%); }
+  .plan-card__head { min-height: 128px; }
+  h3 { font-size: clamp(2.2rem, 3.2vw, 3rem); }
+  .plan-card__head p { max-width: 290px; margin-top: 13px; color: var(--muted); font-size: 0.82rem; }
+  .plan-card--featured .plan-card__head p, .plan-card--featured .plan-card__billing { color: var(--muted-dark); }
+  .plan-card__price { display: flex; align-items: flex-start; margin-top: 22px; font-family: var(--display); line-height: 1; }
+  .plan-card__currency { margin-top: 9px; font-size: 1.6rem; font-weight: 600; }
+  .plan-card__price strong { font-size: clamp(4.3rem, 6vw, 5.6rem); font-weight: 700; letter-spacing: -0.04em; }
+  .plan-card__period { align-self: flex-end; margin: 0 0 12px 8px; color: var(--muted); font-family: var(--body); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; }
+  .plan-card--featured .plan-card__period { color: var(--muted-dark); }
+  .plan-card__billing { min-height: 20px; margin: 6px 0 26px; color: var(--muted); font-size: 0.66rem; }
+  .plan-card__features { margin: 30px 0 0; font-size: 0.78rem; }
+  .plan-card--featured .check-list .icon { color: var(--lime); }
+  .plan-card--featured .button--lime:hover { background: var(--white); }
+  @media (min-width: 901px) {
+    .plan-card--featured { transform: translateY(-14px); }
+  }
+  @media (max-width: 640px) {
+    .plan-card__head { min-height: 100px; }
+  }
+</style>

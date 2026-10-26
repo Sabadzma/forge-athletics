@@ -1,0 +1,38 @@
+---
+import Icon from './Icon.astro';
+import type { Service } from '../data/gym';
+interface Props { service: Service; index?: number; }
+const { service, index = 0 } = Astro.props;
+---
+<article class="service-card">
+  <a href={`/services#${service.slug}`} aria-label={`Learn about ${service.title}`}>
+    <div class="service-card__media">
+      <img src={service.image} alt="" width="800" height="600" loading="lazy" />
+      <span class="service-card__number">0{index + 1}</span>
+      <span class="service-card__icon"><Icon name={service.icon} size={25} /></span>
+    </div>
+    <div class="service-card__body">
+      <h3>{service.title}</h3>
+      <p>{service.description}</p>
+      <span class="text-link">Explore service <Icon name="arrow-up-right" size={15} /></span>
+    </div>
+  </a>
+</article>
+
+<style>
+  .service-card { min-width: 0; border: 1px solid var(--line); background: var(--white); transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease; }
+  .service-card:hover { border-color: var(--ink); box-shadow: var(--shadow); transform: translateY(-5px); }
+  .service-card__media { position: relative; aspect-ratio: 1.5; overflow: hidden; background: var(--ink-soft); }
+  .service-card__media::after { position: absolute; inset: 0; background: linear-gradient(180deg, rgb(0 0 0 / 0.2), transparent 55%); content: ''; }
+  .service-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 500ms cubic-bezier(.2,.7,.2,1); }
+  .service-card:hover img { transform: scale(1.045); }
+  .service-card__number { position: absolute; top: 18px; left: 18px; z-index: 1; color: var(--white); font-size: 0.67rem; font-weight: 800; letter-spacing: 0.1em; }
+  .service-card__icon { position: absolute; right: 18px; bottom: 18px; z-index: 1; display: grid; width: 48px; height: 48px; place-items: center; background: var(--lime); color: var(--ink); }
+  .service-card__body { display: flex; min-height: 270px; flex-direction: column; align-items: flex-start; padding: 28px; }
+  h3 { font-size: clamp(1.8rem, 2.5vw, 2.35rem); }
+  p { margin-top: 16px; color: var(--muted); font-size: 0.88rem; line-height: 1.7; }
+  .text-link { margin-top: auto; padding-top: 26px; }
+  @media (max-width: 640px) {
+    .service-card__body { min-height: 245px; padding: 24px; }
+  }
+</style>

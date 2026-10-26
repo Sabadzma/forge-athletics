@@ -1,0 +1,51 @@
+---
+import Icon from './Icon.astro';
+interface Props {
+  title?: string;
+  accent?: string;
+  description?: string;
+}
+const {
+  title = 'Ready when',
+  accent = 'you are.',
+  description = 'Your first session is on us. Come see the space, meet a coach, and leave with a plan.',
+} = Astro.props;
+---
+<section class="cta-section">
+  <div class="container cta-inner">
+    <div class="cta-copy">
+      <p class="eyebrow">One session. Zero pressure.</p>
+      <h2>{title}<br /><span>{accent}</span></h2>
+    </div>
+    <div class="cta-action">
+      <p>{description}</p>
+      <div class="cta-buttons">
+        <a class="button button--dark" href="/contact?intent=trial">Claim your free session <Icon name="arrow-up-right" size={18} class="icon--arrow" /></a>
+        <a class="text-link" href="/schedule">View class schedule <Icon name="arrow-right" size={16} /></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta-section { position: relative; overflow: hidden; padding-block: clamp(72px, 8vw, 112px); background: var(--lime); color: var(--ink); isolation: isolate; }
+  .cta-section::after { position: absolute; top: -0.18em; left: 42%; z-index: -1; color: rgb(21 23 19 / 0.055); content: 'F'; font-family: var(--display); font-size: 480px; font-weight: 800; line-height: 1; transform: rotate(-8deg); }
+  .cta-inner { display: grid; grid-template-columns: 1.4fr 0.75fr; align-items: end; gap: 80px; }
+  .eyebrow::before { background: var(--ink); }
+  h2 { font-size: clamp(4.5rem, 9vw, 8.5rem); }
+  h2 span { color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
+  .cta-action { display: grid; gap: 30px; padding-bottom: 10px; }
+  .cta-action > p { max-width: 390px; font-size: 1rem; font-weight: 600; }
+  .cta-buttons { display: flex; flex-direction: column; align-items: flex-start; gap: 22px; }
+  .text-link:hover { color: var(--ink); }
+  @media (max-width: 900px) {
+    .cta-inner { grid-template-columns: 1fr; gap: 36px; }
+    .cta-section::after { left: 50%; }
+    .cta-action { padding-bottom: 0; }
+  }
+  @media (max-width: 640px) {
+    h2 { font-size: clamp(4rem, 21vw, 6rem); }
+    .cta-buttons, .cta-buttons .button { width: 100%; }
+    .cta-buttons .text-link { width: auto; }
+  }
+</style>

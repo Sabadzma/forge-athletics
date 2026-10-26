@@ -1,0 +1,121 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import TrainerCard from '../components/TrainerCard.astro';
+import Icon from '../components/Icon.astro';
+import CallToAction from '../components/CallToAction.astro';
+import { trainers } from '../data/gym';
+const specialties = ['All', ...new Set(trainers.flatMap((trainer) => trainer.specialties))];
+---
+<BaseLayout title="Trainers" description="Meet the experienced strength, conditioning, mobility, and nutrition coaches at FORGE Athletics in Austin.">
+  <PageHero
+    eyebrow="Our trainers"
+    title="Good people."
+    accent="Serious coaching."
+    description="Knowledge matters. So does knowing how to listen. Our coaches bring both to every session, whatever your experience."
+  >
+    <a class="text-link" href="/contact?intent=trial">Find your coach<Icon name="arrow-up-right" size={16} /></a>
+  </PageHero>
+
+  <section class="section">
+    <div class="container">
+      <div class="trainer-tools">
+        <div class="filter-bar" aria-label="Filter trainers by specialty">
+          {specialties.map((specialty) => (
+            <button class="filter-button" type="button" data-trainer-filter data-filter={specialty} aria-pressed={specialty === 'All' ? 'true' : 'false'}>{specialty}</button>
+          ))}
+        </div>
+        <p class="meta" data-trainer-count aria-live="polite">{trainers.length} coaches</p>
+      </div>
+      <div class="card-grid trainers-grid">
+        {trainers.map((trainer) => <TrainerCard trainer={trainer} detailed />)}
+      </div>
+      <p class="empty-state" data-trainer-empty hidden>No coaches match this specialty yet. Try another filter or contact us for a recommendation.</p>
+    </div>
+  </section>
+
+  <section class="section section--dark">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__copy">
+          <p class="eyebrow">How we coach</p>
+          <h2 class="section-title">No egos on the gym floor.</h2>
+          <p>Good coaching should leave you feeling more capable, not more confused. That is the standard we hold ourselves to.</p>
+        </div>
+      </div>
+      <div class="coaching-values">
+        <article><span>01</span><h3>Listen first</h3><p>Your goals, history, and life outside the gym shape the plan. We start with a conversation, not assumptions.</p></article>
+        <article><span>02</span><h3>Explain the why</h3><p>You deserve to understand what you are doing. Clear cues and context build confidence long after the session ends.</p></article>
+        <article><span>03</span><h3>Progress over pressure</h3><p>We challenge you without punishing you. Sustainable effort and good technique always come before a number on the bar.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white team-note">
+    <div class="container team-note__grid">
+      <div class="team-note__image"><img src="/images/gym-space.jpg" alt="The open training floor at FORGE" width="1100" height="760" loading="lazy" /></div>
+      <div>
+        <p class="eyebrow">A coach, not a cheerleader</p>
+        <h2 class="section-title section-title--small">Support with substance.</h2>
+        <p>Encouragement is great. Specific, useful feedback is better. Our coaches complete ongoing education, review programming together every week, and share what they learn across the team.</p>
+        <ul class="check-list">
+          <li><Icon name="check" size={18} /><span>Nationally accredited certifications</span></li>
+          <li><Icon name="check" size={18} /><span>Weekly programming reviews</span></li>
+          <li><Icon name="check" size={18} /><span>First-aid and CPR trained team</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <CallToAction title="Your goals." accent="Our focus." description="Tell us what you’re working toward and we’ll pair you with the right coach for a free first session." />
+</BaseLayout>
+
+<script>
+  const filterButtons = [...document.querySelectorAll<HTMLButtonElement>('[data-trainer-filter]')];
+  const trainerCards = [...document.querySelectorAll<HTMLElement>('[data-trainer-card]')];
+  const count = document.querySelector<HTMLElement>('[data-trainer-count]');
+  const empty = document.querySelector<HTMLElement>('[data-trainer-empty]');
+
+  const filterTrainers = (filter: string) => {
+    let visible = 0;
+    trainerCards.forEach((card) => {
+      const specialties = card.dataset.specialties?.split('|') ?? [];
+      const show = filter === 'All' || specialties.includes(filter);
+      card.hidden = !show;
+      if (show) visible += 1;
+    });
+    filterButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.filter === filter)));
+    if (count) count.textContent = `${visible} ${visible === 1 ? 'coach' : 'coaches'}`;
+    if (empty) empty.hidden = visible !== 0;
+  };
+
+  filterButtons.forEach((button) => button.addEventListener('click', () => filterTrainers(button.dataset.filter ?? 'All')));
+</script>
+
+<style>
+  .trainer-tools { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 54px; }
+  .trainers-grid { row-gap: 60px; }
+  .trainers-grid > :global(.trainer-card)[hidden] { display: none; }
+  .coaching-values { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line-dark); border-left: 1px solid var(--line-dark); }
+  .coaching-values article { padding: clamp(28px, 4vw, 48px); border-right: 1px solid var(--line-dark); border-bottom: 1px solid var(--line-dark); }
+  .coaching-values article > span { color: var(--lime); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.08em; }
+  .coaching-values h3 { margin-top: 44px; font-size: clamp(2rem, 3.4vw, 3rem); }
+  .coaching-values p { margin-top: 18px; color: var(--muted-dark); font-size: 0.82rem; }
+  .team-note__grid { display: grid; grid-template-columns: 1.1fr 0.9fr; align-items: center; gap: clamp(56px, 8vw, 120px); }
+  .team-note__image { aspect-ratio: 1.3; }
+  .team-note__image img { width: 100%; height: 100%; object-fit: cover; }
+  .team-note__grid > div:last-child > p:not(.eyebrow) { margin-top: 24px; color: var(--muted); font-size: 0.88rem; }
+  .check-list { margin-top: 28px; font-size: 0.78rem; }
+
+  @media (max-width: 900px) {
+    .trainer-tools { align-items: flex-start; flex-direction: column; }
+    .coaching-values { grid-template-columns: 1fr; }
+    .coaching-values h3 { margin-top: 24px; }
+    .team-note__grid { grid-template-columns: 1fr; gap: 44px; }
+  }
+  @media (max-width: 640px) {
+    .trainers-grid { row-gap: 42px; }
+    .trainer-tools { margin-bottom: 40px; }
+    .team-note__image { aspect-ratio: 1.1; }
+  }
+</style>

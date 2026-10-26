@@ -1,0 +1,97 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { navigation, site } from '../data/gym';
+
+const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+---
+<header class="site-header" data-header>
+  <div class="container header-inner">
+    <Logo />
+    <nav class="desktop-nav" aria-label="Main navigation">
+      {navigation.map((item) => (
+        <a href={item.href} class:list={[{ active: isActive(item.href) }]} aria-current={isActive(item.href) ? 'page' : undefined}>
+          {item.label}
+        </a>
+      ))}
+    </nav>
+    <a class="button button--lime header-cta" href="/contact?intent=trial">Free session <Icon name="arrow-up-right" size={17} class="icon--arrow" /></a>
+    <button class="menu-button" type="button" aria-expanded="false" aria-controls="mobile-navigation" aria-label="Open menu" data-menu-button>
+      <span class="menu-open-icon"><Icon name="menu" size={25} /></span>
+      <span class="menu-close-icon"><Icon name="close" size={25} /></span>
+    </button>
+  </div>
+  <nav class="mobile-nav" id="mobile-navigation" aria-label="Mobile navigation" data-mobile-menu hidden>
+    <div class="container mobile-nav__inner">
+      <div class="mobile-nav__links">
+        {navigation.map((item, index) => (
+          <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+            <span class="mobile-nav__number">0{index + 1}</span>{item.label}<Icon name="arrow-up-right" size={24} />
+          </a>
+        ))}
+      </div>
+      <div class="mobile-nav__footer">
+        <a class="button button--lime button--full" href="/contact?intent=trial">Claim a free session <Icon name="arrow-up-right" size={18} /></a>
+        <p>{site.addressShort} · <a href={`tel:${site.phoneHref}`}>{site.phone}</a></p>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('[data-menu-button]');
+  const menu = document.querySelector<HTMLElement>('[data-mobile-menu]');
+
+  const setMenu = (open: boolean) => {
+    if (!button || !menu) return;
+    button.setAttribute('aria-expanded', String(open));
+    button.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    menu.hidden = !open;
+    document.body.classList.toggle('menu-open', open);
+  };
+
+  button?.addEventListener('click', () => setMenu(button.getAttribute('aria-expanded') !== 'true'));
+  menu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => setMenu(false)));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setMenu(false);
+  });
+  window.matchMedia('(min-width: 981px)').addEventListener('change', (event) => {
+    if (event.matches) setMenu(false);
+  });
+</script>
+
+<style>
+  .site-header { position: fixed; inset: 0 0 auto; z-index: 100; height: var(--header-height); border-bottom: 1px solid rgb(255 255 255 / 0.13); background: rgb(21 23 19 / 0.92); color: var(--white); backdrop-filter: blur(16px); }
+  .header-inner { display: flex; height: 100%; align-items: center; gap: 32px; }
+  .desktop-nav { display: flex; align-items: center; gap: clamp(18px, 2.1vw, 32px); margin-left: auto; }
+  .desktop-nav a { position: relative; padding: 28px 0; color: #d4d8ce; font-size: 0.71rem; font-weight: 800; letter-spacing: 0.075em; text-transform: uppercase; transition: color 160ms ease; }
+  .desktop-nav a::after { position: absolute; right: 0; bottom: 18px; left: 0; height: 2px; background: var(--lime); content: ''; transform: scaleX(0); transform-origin: left; transition: transform 160ms ease; }
+  .desktop-nav a:hover, .desktop-nav a.active { color: var(--lime); }
+  .desktop-nav a.active::after { transform: scaleX(1); }
+  .header-cta { min-height: 42px; padding: 11px 16px; font-size: 0.68rem; }
+  .menu-button { display: none; width: 44px; height: 44px; align-items: center; justify-content: center; margin-left: auto; background: transparent; color: var(--white); }
+  .menu-close-icon { display: none; }
+  .menu-button[aria-expanded='true'] .menu-open-icon { display: none; }
+  .menu-button[aria-expanded='true'] .menu-close-icon { display: block; }
+  .mobile-nav { position: fixed; inset: var(--header-height) 0 0; height: calc(100dvh - var(--header-height)); background: var(--ink); overflow-y: auto; }
+  .mobile-nav[hidden] { display: none; }
+  .mobile-nav__inner { display: flex; min-height: 100%; flex-direction: column; justify-content: space-between; padding-block: 32px; }
+  .mobile-nav__links { display: grid; }
+  .mobile-nav__links > a { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 12px; padding: 15px 0; border-bottom: 1px solid var(--line-dark); font-family: var(--display); font-size: clamp(2rem, 7vw, 3rem); font-weight: 600; line-height: 1; text-transform: uppercase; }
+  .mobile-nav__links > a[aria-current='page'] { color: var(--lime); }
+  .mobile-nav__number { color: var(--muted-dark); font-family: var(--body); font-size: 0.62rem; letter-spacing: 0.1em; }
+  .mobile-nav__footer { display: grid; gap: 20px; padding-top: 32px; }
+  .mobile-nav__footer p { color: var(--muted-dark); font-size: 0.75rem; text-align: center; }
+  .mobile-nav__footer p a { color: var(--white); }
+
+  @media (max-width: 1100px) {
+    .header-inner { gap: 20px; }
+    .desktop-nav { gap: 17px; }
+    .desktop-nav a { font-size: 0.66rem; }
+  }
+  @media (max-width: 980px) {
+    .desktop-nav, .header-cta { display: none; }
+    .menu-button { display: flex; }
+  }
+</style>

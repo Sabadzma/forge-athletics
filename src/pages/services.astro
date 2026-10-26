@@ -1,0 +1,124 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import FaqList from '../components/FaqList.astro';
+import CallToAction from '../components/CallToAction.astro';
+import { services } from '../data/gym';
+---
+<BaseLayout title="Services" description="Strength training, group classes, personal coaching, mobility, nutrition, and 24/7 open gym access at FORGE in Austin.">
+  <PageHero
+    eyebrow="Services"
+    title="Coaching for"
+    accent="real life."
+    description="Whatever your starting point, there is a place for you here. Choose your format and we’ll help with everything else."
+  >
+    <a class="text-link" href="/schedule">See this week’s classes<Icon name="arrow-up-right" size={16} /></a>
+  </PageHero>
+
+  <section class="section--compact service-principles">
+    <div class="container principles-grid">
+      <p><strong>01</strong><span>Every session<br />coach-led</span></p>
+      <p><strong>02</strong><span>Every movement<br />scalable</span></p>
+      <p><strong>03</strong><span>Every plan<br />purposeful</span></p>
+      <p><strong>04</strong><span>Every body<br />welcome</span></p>
+    </div>
+  </section>
+
+  <div class="service-details">
+    {services.map((service, index) => (
+      <section class:list={['section', 'service-detail', { 'section--white': index % 2 === 1 }]} id={service.slug}>
+        <div class="container service-detail__grid">
+          <div class="service-detail__media">
+            <img src={service.image} alt={`${service.title} at FORGE`} width="1100" height="900" loading="lazy" />
+            <span class="service-detail__number">0{index + 1}</span>
+          </div>
+          <div class="service-detail__content">
+            <div class="service-detail__icon"><Icon name={service.icon} size={27} /></div>
+            <p class="eyebrow">{service.duration}</p>
+            <h2>{service.title}</h2>
+            <p class="service-detail__lead">{service.description}</p>
+            <p class="service-detail__details">{service.details}</p>
+            <ul class="check-list">
+              {service.outcomes.map((outcome) => <li><Icon name="check" size={18} /><span>{outcome}</span></li>)}
+            </ul>
+            <a class="button button--dark" href={`/contact?service=${service.slug}`}>Ask about {service.shortTitle}<Icon name="arrow-up-right" size={17} /></a>
+          </div>
+        </div>
+      </section>
+    ))}
+  </div>
+
+  <section class="section section--dark service-help">
+    <div class="container service-help__grid">
+      <div>
+        <p class="eyebrow">Not sure where to start?</p>
+        <h2 class="section-title">That’s our job.</h2>
+      </div>
+      <div>
+        <p>Tell us what you want to work on, how much time you have, and what has or hasn’t worked before. We’ll recommend the simplest path forward—even if that starts with just one session a week.</p>
+        <a class="button button--lime" href="/contact?intent=recommendation">Get a recommendation<Icon name="arrow-up-right" size={17} /></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white">
+    <div class="container faq-grid">
+      <div>
+        <p class="eyebrow">Good to know</p>
+        <h2 class="section-title section-title--small">Before your first visit.</h2>
+        <p class="faq-intro">Still wondering about something? Call or email our front desk and a real person will help.</p>
+        <a class="text-link" href="/contact">Talk to the team<Icon name="arrow-up-right" size={16} /></a>
+      </div>
+      <FaqList limit={4} />
+    </div>
+  </section>
+
+  <CallToAction title="One visit." accent="Zero pressure." />
+</BaseLayout>
+
+<style>
+  .service-principles { border-bottom: 1px solid var(--line); background: var(--lime); }
+  .principles-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .principles-grid p { display: flex; align-items: center; gap: 16px; padding: 4px 24px; border-right: 1px solid rgb(21 23 19 / 0.2); }
+  .principles-grid p:first-child { padding-left: 0; }
+  .principles-grid p:last-child { border-right: 0; }
+  .principles-grid strong { font-family: var(--display); font-size: 2.5rem; font-weight: 600; line-height: 1; }
+  .principles-grid span { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; line-height: 1.5; text-transform: uppercase; }
+  .service-detail { scroll-margin-top: var(--header-height); }
+  .service-detail__grid { display: grid; grid-template-columns: 1.08fr 0.92fr; align-items: center; gap: clamp(56px, 8vw, 120px); }
+  .service-detail__media { position: relative; aspect-ratio: 1.18; }
+  .service-detail__media img { width: 100%; height: 100%; object-fit: cover; }
+  .service-detail__number { position: absolute; top: 0; left: 0; display: grid; width: 62px; height: 62px; place-items: center; background: var(--lime); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; }
+  .service-detail:nth-child(even) .service-detail__media { order: 2; }
+  .service-detail__icon { display: grid; width: 54px; height: 54px; place-items: center; margin-bottom: 28px; border: 1px solid var(--line); }
+  .service-detail__content .eyebrow { margin-bottom: 16px; }
+  h2 { font-size: clamp(3.2rem, 5.3vw, 5rem); }
+  .service-detail__lead { margin-top: 24px; font-size: 1.02rem; font-weight: 600; line-height: 1.65; }
+  .service-detail__details { margin-top: 18px; color: var(--muted); font-size: 0.86rem; line-height: 1.75; }
+  .check-list { margin: 28px 0 32px; font-size: 0.8rem; }
+  .service-help__grid { display: grid; grid-template-columns: 1fr 0.75fr; align-items: end; gap: 80px; }
+  .service-help__grid > div:last-child > p { color: var(--muted-dark); font-size: 0.94rem; }
+  .service-help__grid .button { margin-top: 30px; }
+  .faq-grid { display: grid; grid-template-columns: 0.7fr 1fr; align-items: start; gap: clamp(56px, 8vw, 120px); }
+  .faq-intro { max-width: 360px; margin: 24px 0; color: var(--muted); font-size: 0.85rem; }
+
+  @media (max-width: 900px) {
+    .principles-grid { grid-template-columns: repeat(2, 1fr); gap: 24px 0; }
+    .principles-grid p:nth-child(2) { border-right: 0; }
+    .principles-grid p:first-child { padding-left: 24px; }
+    .service-detail__grid { grid-template-columns: 1fr; gap: 44px; }
+    .service-detail__media { aspect-ratio: 1.5; }
+    .service-detail:nth-child(even) .service-detail__media { order: 0; }
+    .service-detail__content { max-width: 680px; }
+    .service-help__grid, .faq-grid { grid-template-columns: 1fr; gap: 36px; }
+  }
+  @media (max-width: 640px) {
+    .principles-grid p { align-items: flex-start; flex-direction: column; gap: 7px; padding: 4px 14px; }
+    .principles-grid p:first-child { padding-left: 14px; }
+    .principles-grid strong { font-size: 2rem; }
+    .service-detail__media { aspect-ratio: 1.1; }
+    .service-detail__number { width: 50px; height: 50px; }
+    .service-detail__icon { margin-bottom: 22px; }
+  }
+</style>

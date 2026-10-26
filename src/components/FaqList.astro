@@ -1,0 +1,14 @@
+---
+import { faqs } from '../data/gym';
+interface Props { limit?: number; }
+const { limit } = Astro.props;
+const items = typeof limit === 'number' ? faqs.slice(0, limit) : faqs;
+---
+<div class="faq-list">
+  {items.map((faq, index) => (
+    <details class="faq-item" open={index === 0 && limit === undefined}>
+      <summary>{faq.question}</summary>
+      <div class="faq-item__answer"><p>{faq.answer}</p></div>
+    </details>
+  ))}
+</div>

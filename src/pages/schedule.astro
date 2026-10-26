@@ -1,0 +1,179 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import CallToAction from '../components/CallToAction.astro';
+import { schedule } from '../data/gym';
+const days = Object.keys(schedule);
+---
+<BaseLayout title="Class Schedule" description="Browse this week’s strength, conditioning, and mobility classes at FORGE Athletics in Austin.">
+  <PageHero
+    eyebrow="Class schedule"
+    title="Make time"
+    accent="to move."
+    description="Early starts, lunch breaks, after work, and weekends. Find a session that fits and we’ll take care of the plan."
+  >
+    <a class="text-link" href="/contact?intent=trial">Book a free first session<Icon name="arrow-up-right" size={16} /></a>
+  </PageHero>
+
+  <section class="section schedule-section">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__copy">
+          <p class="eyebrow">This week at FORGE</p>
+          <h2 class="section-title section-title--small">Pick a day. Show up.</h2>
+          <p>Class sizes are capped at twelve. Requesting a spot opens a pre-filled email to our front desk.</p>
+        </div>
+        <p class="schedule-updated"><span></span>Schedule updated Oct 26</p>
+      </div>
+
+      <div class="day-tabs" role="tablist" aria-label="Class schedule by day">
+        {days.map((day, index) => (
+          <button
+            type="button"
+            role="tab"
+            id={`tab-${day.toLowerCase()}`}
+            aria-controls={`panel-${day.toLowerCase()}`}
+            aria-selected={index === 0 ? 'true' : 'false'}
+            tabindex={index === 0 ? 0 : -1}
+            data-day-tab={day}
+          ><span>{day.slice(0, 3)}</span>{day}</button>
+        ))}
+      </div>
+      <p class="sr-only" aria-live="polite" data-schedule-status>Showing Monday classes</p>
+
+      <div class="schedule-panels">
+        {days.map((day, dayIndex) => (
+          <div
+            role="tabpanel"
+            id={`panel-${day.toLowerCase()}`}
+            aria-labelledby={`tab-${day.toLowerCase()}`}
+            data-schedule-panel={day}
+            hidden={dayIndex !== 0}
+          >
+            <div class="schedule-day-heading"><h3>{day}</h3><span>{schedule[day].length} classes · All times CT</span></div>
+            <div class="session-list">
+              {schedule[day].map((session) => (
+                <article class="session-row">
+                  <div class="session-time"><strong>{session.time}</strong><span>{session.duration}</span></div>
+                  <div class="session-name"><span>{session.category}</span><h4>{session.name}</h4></div>
+                  <div class="session-detail"><span>Coach</span><strong>{session.coach}</strong></div>
+                  <div class="session-detail"><span>Intensity</span><strong>{session.intensity}</strong></div>
+                  <div class:list={['session-spots', { low: session.spots <= 3 }]}><span></span>{session.spots <= 3 ? 'Only ' : ''}{session.spots} spots</div>
+                  <a class="button button--outline" href={`/contact?class=${encodeURIComponent(session.name)}&day=${day}`}>Request spot<Icon name="arrow-up-right" size={16} /></a>
+                </article>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div class="open-gym-note"><div><Icon name="clock" size={25} /><p><strong>Prefer your own program?</strong><br />Open gym is available 24/7 for members.</p></div><a class="text-link" href="/services#open-gym">Explore open gym<Icon name="arrow-up-right" size={16} /></a></div>
+    </div>
+  </section>
+
+  <section class="section section--dark">
+    <div class="container">
+      <div class="section-head"><div class="section-head__copy"><p class="eyebrow">Know before you go</p><h2 class="section-title section-title--small">Three formats. One good hour.</h2></div></div>
+      <div class="class-types">
+        <article><Icon name="barbell" size={28} /><span>Strength</span><h3>Build your base.</h3><p>Practice foundational lifts and progress at your pace. Every movement has options and every working set gets coach attention.</p><a href="/services#strength-conditioning">Explore strength<Icon name="arrow-up-right" size={15} /></a></article>
+        <article><Icon name="activity" size={28} /><span>Conditioning</span><h3>Raise your engine.</h3><p>Intervals, circuits, and athletic conditioning with clear work-to-rest targets. Push the pace without sacrificing good movement.</p><a href="/services#small-group-training">Explore conditioning<Icon name="arrow-up-right" size={15} /></a></article>
+        <article><Icon name="plus" size={28} /><span>Mobility</span><h3>Make space to move.</h3><p>Low-impact sessions that combine usable range of motion, stability, and breathwork. Ideal between harder training days.</p><a href="/services#mobility-recovery">Explore mobility<Icon name="arrow-up-right" size={15} /></a></article>
+      </div>
+    </div>
+  </section>
+
+  <CallToAction title="Your calendar." accent="Your strongest hour." description="If you’re new, start with a free session. We’ll help you choose the right class and introduce you to your coach." />
+</BaseLayout>
+
+<script>
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-day-tab]')];
+  const panels = [...document.querySelectorAll<HTMLElement>('[data-schedule-panel]')];
+  const status = document.querySelector<HTMLElement>('[data-schedule-status]');
+
+  const selectDay = (day: string, focus = false) => {
+    tabs.forEach((tab) => {
+      const selected = tab.dataset.dayTab === day;
+      tab.setAttribute('aria-selected', String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+      if (selected && focus) tab.focus();
+    });
+    panels.forEach((panel) => { panel.hidden = panel.dataset.schedulePanel !== day; });
+    if (status) status.textContent = `Showing ${day} classes`;
+  };
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => selectDay(tab.dataset.dayTab ?? 'Monday'));
+    tab.addEventListener('keydown', (event) => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      const nextIndex = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+      selectDay(tabs[nextIndex].dataset.dayTab ?? 'Monday', true);
+    });
+  });
+
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+  if (tabs.some((tab) => tab.dataset.dayTab === today)) selectDay(today);
+</script>
+
+<style>
+  .schedule-updated { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 0.65rem; font-weight: 700; text-transform: uppercase; }
+  .schedule-updated > span { width: 7px; height: 7px; border-radius: 50%; background: #779800; box-shadow: 0 0 0 4px rgb(119 152 0 / 0.13); }
+  .day-tabs { display: grid; grid-template-columns: repeat(7, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+  .day-tabs button { min-height: 64px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--white); font-size: 0.72rem; font-weight: 800; text-transform: uppercase; }
+  .day-tabs button span { display: none; }
+  .day-tabs button:hover { background: var(--paper-deep); }
+  .day-tabs button[aria-selected='true'] { background: var(--ink); color: var(--lime); }
+  .schedule-panels { margin-top: 42px; }
+  [data-schedule-panel][hidden] { display: none; }
+  .schedule-day-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 20px; }
+  .schedule-day-heading h3 { font-size: 2rem; }
+  .schedule-day-heading > span { color: var(--muted); font-size: 0.64rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+  .session-list { border-top: 1px solid var(--line); }
+  .session-row { display: grid; grid-template-columns: 105px minmax(170px, 1.4fr) minmax(85px, 0.7fr) minmax(85px, 0.7fr) 105px 140px; align-items: center; gap: 22px; padding: 24px 0; border-bottom: 1px solid var(--line); }
+  .session-time { display: grid; }
+  .session-time strong { font-family: var(--display); font-size: 1.55rem; line-height: 1; }
+  .session-time span, .session-detail span { margin-top: 6px; color: var(--muted); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+  .session-name > span { color: #5b7300; font-size: 0.58rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+  .session-name h4 { margin-top: 6px; font-size: 1.55rem; }
+  .session-detail { display: grid; }
+  .session-detail span { margin: 0 0 4px; }
+  .session-detail strong { font-size: 0.7rem; }
+  .session-spots { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 0.62rem; font-weight: 700; }
+  .session-spots > span { width: 6px; height: 6px; border-radius: 50%; background: #779800; }
+  .session-spots.low { color: #9a4c24; }
+  .session-spots.low > span { background: #b65d30; }
+  .session-row .button { min-height: 42px; padding: 10px 13px; font-size: 0.61rem; }
+  .open-gym-note { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 42px; padding: 26px 30px; background: var(--paper-deep); }
+  .open-gym-note > div { display: flex; align-items: center; gap: 16px; }
+  .open-gym-note .icon { color: #5b7300; }
+  .open-gym-note p { color: var(--muted); font-size: 0.72rem; }
+  .open-gym-note p strong { color: var(--ink); font-size: 0.8rem; }
+  .class-types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line-dark); border: 1px solid var(--line-dark); }
+  .class-types article { padding: clamp(28px, 4vw, 44px); background: var(--ink); }
+  .class-types article > .icon { margin-bottom: 28px; color: var(--lime); }
+  .class-types article > span { color: var(--muted-dark); font-size: 0.6rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+  .class-types h3 { margin-top: 12px; font-size: 2.35rem; }
+  .class-types p { margin-top: 18px; color: var(--muted-dark); font-size: 0.8rem; }
+  .class-types a { display: inline-flex; align-items: center; gap: 8px; margin-top: 26px; color: var(--lime); font-size: 0.66rem; font-weight: 800; text-transform: uppercase; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+  @media (max-width: 1100px) {
+    .session-row { grid-template-columns: 95px 1.3fr 0.7fr 0.7fr 125px; }
+    .session-spots { display: none; }
+  }
+  @media (max-width: 900px) {
+    .day-tabs button { font-size: 0.64rem; }
+    .session-row { grid-template-columns: 90px 1fr 0.65fr 125px; gap: 16px; }
+    .session-detail:nth-of-type(4) { display: none; }
+    .class-types { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 700px) {
+    .day-tabs button span { display: inline; }
+    .day-tabs button { font-size: 0; }
+    .day-tabs button span { font-size: 0.66rem; }
+    .session-row { grid-template-columns: 82px 1fr; gap: 18px; padding: 24px 0; }
+    .session-detail { display: none; }
+    .session-row .button { grid-column: 1 / -1; width: 100%; }
+    .open-gym-note { align-items: flex-start; flex-direction: column; padding: 24px; }
+    .schedule-day-heading > span { display: none; }
+  }
+</style>

@@ -1,0 +1,100 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import Icon from '../../components/Icon.astro';
+import CallToAction from '../../components/CallToAction.astro';
+import { posts } from '../../data/gym';
+const categories = ['All', ...new Set(posts.map((post) => post.category))];
+const featured = posts.find((post) => post.featured) ?? posts[0];
+const remaining = posts.filter((post) => post.slug !== featured.slug);
+---
+<BaseLayout title="Journal" description="Practical training, nutrition, recovery, and gym-life advice from the coaches at FORGE Athletics.">
+  <PageHero
+    eyebrow="The FORGE journal"
+    title="Train smarter."
+    accent="Live better."
+    description="Straightforward ideas from our coaches. No miracle workouts, detox teas, or before-and-after nonsense."
+  >
+    <a class="text-link" href="#latest">Start reading<Icon name="arrow-right" size={16} /></a>
+  </PageHero>
+
+  <section class="section journal-section" id="latest">
+    <div class="container">
+      <div class="journal-tools">
+        <div>
+          <p class="eyebrow">Latest thinking</p>
+          <h2 class="section-title section-title--small">Notes from the gym floor.</h2>
+        </div>
+        <div class="filter-bar" aria-label="Filter articles by category">
+          {categories.map((category) => <button class="filter-button" type="button" data-post-filter data-filter={category} aria-pressed={category === 'All' ? 'true' : 'false'}>{category}</button>)}
+        </div>
+      </div>
+      <p class="sr-only" data-post-status aria-live="polite">Showing all {posts.length} articles</p>
+      <div class="featured-post">
+        <BlogCard post={featured} featured eager />
+      </div>
+      <div class="card-grid journal-grid">
+        {remaining.map((post) => <BlogCard post={post} />)}
+      </div>
+      <p class="empty-state" data-post-empty hidden>No articles in this category yet. Choose another topic to keep reading.</p>
+    </div>
+  </section>
+
+  <section class="section--compact section--dark journal-note">
+    <div class="container journal-note__inner">
+      <Icon name="barbell" size={34} />
+      <p>Reading is useful. <strong>Doing is better.</strong></p>
+      <a class="button button--lime" href="/contact?intent=trial">Put it into practice<Icon name="arrow-up-right" size={17} /></a>
+    </div>
+  </section>
+
+  <CallToAction title="Less scrolling." accent="More lifting." description="Take the next useful step with a free coached session at our Austin club." />
+</BaseLayout>
+
+<script>
+  const filterButtons = [...document.querySelectorAll<HTMLButtonElement>('[data-post-filter]')];
+  const postCards = [...document.querySelectorAll<HTMLElement>('[data-post-card]')];
+  const empty = document.querySelector<HTMLElement>('[data-post-empty]');
+  const status = document.querySelector<HTMLElement>('[data-post-status]');
+
+  const filterPosts = (filter: string) => {
+    let visible = 0;
+    postCards.forEach((card) => {
+      const show = filter === 'All' || card.dataset.category === filter;
+      card.hidden = !show;
+      if (show) visible += 1;
+    });
+    filterButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.filter === filter)));
+    if (empty) empty.hidden = visible !== 0;
+    if (status) status.textContent = filter === 'All' ? `Showing all ${visible} articles` : `Showing ${visible} ${filter} ${visible === 1 ? 'article' : 'articles'}`;
+  };
+
+  filterButtons.forEach((button) => button.addEventListener('click', () => filterPosts(button.dataset.filter ?? 'All')));
+</script>
+
+<style>
+  .journal-section { scroll-margin-top: var(--header-height); }
+  .journal-tools { display: flex; align-items: end; justify-content: space-between; gap: 40px; margin-bottom: 58px; }
+  .journal-tools .filter-bar { justify-content: flex-end; }
+  .featured-post { padding-bottom: 72px; border-bottom: 1px solid var(--line); }
+  .journal-grid { margin-top: 72px; row-gap: 64px; }
+  :global(.post-card)[hidden] { display: none !important; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+  .journal-note__inner { display: flex; align-items: center; gap: 28px; }
+  .journal-note__inner > .icon { color: var(--lime); }
+  .journal-note__inner > p { font-family: var(--display); font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1; text-transform: uppercase; }
+  .journal-note__inner > p strong { color: var(--lime); font-weight: 600; }
+  .journal-note__inner .button { margin-left: auto; flex: 0 0 auto; }
+  @media (max-width: 900px) {
+    .journal-tools { align-items: flex-start; flex-direction: column; }
+    .journal-tools .filter-bar { justify-content: flex-start; }
+    .journal-note__inner { flex-wrap: wrap; }
+    .journal-note__inner .button { margin-left: 0; }
+  }
+  @media (max-width: 640px) {
+    .featured-post { padding-bottom: 52px; }
+    .journal-grid { margin-top: 52px; row-gap: 48px; }
+    .journal-note__inner { align-items: flex-start; flex-direction: column; }
+  }
+</style>

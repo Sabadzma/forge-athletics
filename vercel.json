@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "astro",
+  "installCommand": "bun install --frozen-lockfile",
+  "buildCommand": "bun run build",
+  "outputDirectory": "dist",
+  "headers": [
+    {
+      "source": "/_conloca/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    }
+  ]
+}

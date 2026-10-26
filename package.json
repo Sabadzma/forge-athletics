@@ -1,0 +1,32 @@
+{
+  "name": "forge-athletics",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/react": "^6.0.6",
+    "@conloca/astro-cms": "^0.2.1",
+    "@conloca/cloud-astro": "0.2.1",
+    "@vitejs/plugin-react": "^5.2.0",
+    "astro": "^7.3.8",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "vite": "^8.3.5",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^6.0.3"
+  }
+}

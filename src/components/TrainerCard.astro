@@ -1,0 +1,52 @@
+---
+import Icon from './Icon.astro';
+import type { Trainer } from '../data/gym';
+interface Props { trainer: Trainer; detailed?: boolean; }
+const { trainer, detailed = false } = Astro.props;
+---
+<article
+  class:list={['trainer-card', { 'trainer-card--detailed': detailed }]}
+  id={detailed ? trainer.slug : undefined}
+  data-trainer-card={detailed ? '' : undefined}
+  data-specialties={trainer.specialties.join('|')}
+>
+  <div class="trainer-card__media">
+    <img src={trainer.image} alt={`${trainer.name}, ${trainer.role}`} width="700" height="850" loading="lazy" />
+    <div class="trainer-card__tags">{trainer.specialties.map((specialty) => <span>{specialty}</span>)}</div>
+    {!detailed && <a class="trainer-card__link" href={`/trainers#${trainer.slug}`} aria-label={`Meet ${trainer.name}`}><Icon name="arrow-up-right" size={22} /></a>}
+  </div>
+  <div class="trainer-card__body">
+    <p class="trainer-card__role">{trainer.role}</p>
+    <h3>{detailed ? trainer.name : <a href={`/trainers#${trainer.slug}`}>{trainer.name}</a>}</h3>
+    {detailed && <>
+      <p class="trainer-card__bio">{trainer.bio}</p>
+      <div class="trainer-card__credentials"><span>{trainer.certification}</span><a href={`https://www.instagram.com/${trainer.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer">{trainer.instagram}<Icon name="arrow-up-right" size={13} /></a></div>
+    </>}
+  </div>
+</article>
+
+<style>
+  .trainer-card { min-width: 0; scroll-margin-top: calc(var(--header-height) + 32px); }
+  .trainer-card__media { position: relative; aspect-ratio: 0.82; overflow: hidden; background: #2a2d26; }
+  .trainer-card__media::after { position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgb(0 0 0 / 0.6)); content: ''; pointer-events: none; }
+  .trainer-card__media img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.85); transition: filter 300ms ease, transform 500ms cubic-bezier(.2,.7,.2,1); }
+  .trainer-card:hover img { filter: saturate(1); transform: scale(1.035); }
+  .trainer-card__tags { position: absolute; bottom: 18px; left: 18px; z-index: 1; display: flex; flex-wrap: wrap; gap: 6px; }
+  .trainer-card__tags span { padding: 6px 9px; background: rgb(21 23 19 / 0.84); color: var(--white); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; backdrop-filter: blur(6px); }
+  .trainer-card__link { position: absolute; right: 18px; bottom: 18px; z-index: 2; display: grid; width: 46px; height: 46px; place-items: center; background: var(--lime); color: var(--ink); transition: background-color 160ms ease; }
+  .trainer-card__link:hover { background: var(--white); }
+  .trainer-card__link + * { pointer-events: none; }
+  .trainer-card__media:has(.trainer-card__link) .trainer-card__tags { right: 76px; }
+  .trainer-card__body { padding-top: 20px; }
+  .trainer-card__role { margin-bottom: 8px; color: var(--muted); font-size: 0.63rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+  h3 { font-size: clamp(2rem, 3vw, 2.65rem); }
+  h3 a:hover { color: #5a7300; }
+  .trainer-card__bio { margin-top: 16px; color: var(--muted); font-size: 0.85rem; line-height: 1.75; }
+  .trainer-card__credentials { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 0.62rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
+  .trainer-card__credentials a { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); }
+  .trainer-card__credentials a:hover { color: var(--ink); }
+  .trainer-card--detailed { padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+  @media (max-width: 640px) {
+    .trainer-card__media { aspect-ratio: 0.9; }
+  }
+</style>

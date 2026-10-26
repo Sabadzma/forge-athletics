@@ -1,0 +1,175 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import FaqList from '../components/FaqList.astro';
+import { plans, services, site } from '../data/gym';
+
+const planNames = Object.fromEntries(plans.map((plan) => [plan.slug, plan.name]));
+const serviceNames = Object.fromEntries(services.map((service) => [service.slug, service.title]));
+const defaultMessage = 'I’d like to book my free first session.';
+const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address)}`;
+---
+<BaseLayout title="Contact" description="Visit FORGE Athletics in Austin, ask a membership question, or book a free first session with our coaching team.">
+  <PageHero
+    eyebrow="Contact FORGE"
+    title="Let’s get to"
+    accent="work."
+    description="A question, a goal, or a little nervous about starting? Tell us where you’re at. A real person from our team will help."
+  >
+    <a class="text-link" href={`tel:${site.phoneHref}`}>Call {site.phone}<Icon name="phone" size={15} /></a>
+  </PageHero>
+
+  <section class="section contact-section">
+    <div class="container contact-grid">
+      <div class="contact-form-wrap">
+        <p class="eyebrow">Start a conversation</p>
+        <h2 class="section-title section-title--small">What can we help with?</h2>
+        <p class="contact-form-intro">Fill out the details below and we’ll prepare an email to our front desk. No account needed.</p>
+        <div class="selected-context" data-selected-context hidden><Icon name="check" size={18} /><p data-selected-context-text></p></div>
+        <form class="contact-form" data-contact-form data-recipient={site.email} data-plan-names={JSON.stringify(planNames)} data-service-names={JSON.stringify(serviceNames)}>
+          <div class="form-row">
+            <div class="form-field"><label for="name">Your name</label><input id="name" name="name" type="text" autocomplete="name" placeholder="Jordan Smith" required /></div>
+            <div class="form-field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" placeholder="jordan@example.com" required /></div>
+          </div>
+          <div class="form-row">
+            <div class="form-field"><label for="phone">Phone <span>(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="(512) 555-0100" /></div>
+            <div class="form-field"><label for="interest">I’m interested in</label><select id="interest" name="interest">
+              {['Free first session', 'Membership pricing', 'Training recommendation', 'Personal coaching', 'Group classes', 'Nutrition coaching', 'General question'].map((option) => <option selected={option === 'Free first session'}>{option}</option>)}
+            </select></div>
+          </div>
+          <div class="form-field"><label for="message">Your message</label><textarea id="message" name="message" required set:text={defaultMessage} /></div>
+          <div class="contact-submit">
+            <button class="button button--dark" type="submit">Draft my email<Icon name="arrow-up-right" size={18} /></button>
+            <p>Opens your email app with everything pre-filled. This site does not store your details.</p>
+          </div>
+          <p class="form-status" data-form-status aria-live="polite"></p>
+          <noscript><p class="form-status">JavaScript is off. Email us directly at <a href={`mailto:${site.email}`}>{site.email}</a>.</p></noscript>
+        </form>
+      </div>
+
+      <aside class="contact-aside">
+        <div class="contact-image"><img src="/images/gym-space.jpg" alt="The strength and conditioning floor at FORGE" width="1000" height="700" loading="lazy" /><span>Come say hello.</span></div>
+        <div class="contact-details">
+          <div class="contact-detail"><Icon name="map-pin" size={22} /><div><h3>Visit the club</h3><a href={mapUrl} target="_blank" rel="noopener noreferrer">{site.address}</a><a class="directions-link" href={mapUrl} target="_blank" rel="noopener noreferrer">Get directions<Icon name="arrow-up-right" size={13} /></a></div></div>
+          <div class="contact-detail"><Icon name="phone" size={22} /><div><h3>Talk to us</h3><a href={`tel:${site.phoneHref}`}>{site.phone}</a><a href={`mailto:${site.email}`}>{site.email}</a></div></div>
+          <div class="contact-detail"><Icon name="clock" size={22} /><div><h3>Staffed hours</h3>{site.hours.map((item) => <p class="hours-row"><span>{item.days}</span><strong>{item.time}</strong></p>)}<p class="access-note">Members have secure access 24/7.</p></div></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section--white">
+    <div class="container faq-grid">
+      <div><p class="eyebrow">Quick answers</p><h2 class="section-title section-title--small">Before you visit.</h2><p>Free street bike parking and a three-hour member lot are available behind the club.</p></div>
+      <FaqList limit={3} />
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+  const status = document.querySelector<HTMLElement>('[data-form-status]');
+  const interestField = document.querySelector<HTMLSelectElement>('#interest');
+  const messageField = document.querySelector<HTMLTextAreaElement>('#message');
+  const contextBanner = document.querySelector<HTMLElement>('[data-selected-context]');
+  const contextText = document.querySelector<HTMLElement>('[data-selected-context-text]');
+  const params = new URLSearchParams(window.location.search);
+  const planNames = JSON.parse(form?.dataset.planNames ?? '{}') as Record<string, string>;
+  const serviceNames = JSON.parse(form?.dataset.serviceNames ?? '{}') as Record<string, string>;
+  const planName = planNames[params.get('plan') ?? ''];
+  const serviceName = serviceNames[params.get('service') ?? ''];
+  const className = params.get('class');
+  const day = params.get('day');
+  const intent = params.get('intent');
+  let interest = '';
+  let message = '';
+
+  if (planName) {
+    interest = 'Membership pricing';
+    message = `I’m interested in the ${planName} membership${params.get('billing') === 'annual' ? ' with annual billing' : ''}.`;
+  } else if (serviceName) {
+    interest = serviceName;
+    message = `I’d like to learn more about ${serviceName}.`;
+  } else if (className) {
+    interest = 'Group classes';
+    message = `I’d like to request a spot in ${className}${day ? ` on ${day}` : ''}.`;
+  } else if (intent === 'recommendation') {
+    interest = 'Training recommendation';
+    message = 'I’d like help choosing the best way to get started.';
+  }
+
+  if (interestField && interest) {
+    if (![...interestField.options].some((option) => option.value === interest)) interestField.add(new Option(interest, interest));
+    interestField.value = interest;
+  }
+  if (messageField && message) messageField.value = message;
+  if (contextBanner && contextText && message && (planName || serviceName || className)) {
+    contextText.textContent = message;
+    contextBanner.hidden = false;
+  }
+
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const data = new FormData(form);
+    const name = String(data.get('name') ?? '');
+    const submittedInterest = String(data.get('interest') ?? 'Gym inquiry');
+    const subject = `FORGE: ${submittedInterest} — ${name}`;
+    const body = [
+      `Name: ${name}`,
+      `Email: ${String(data.get('email') ?? '')}`,
+      `Phone: ${String(data.get('phone') ?? '') || 'Not provided'}`,
+      `Interest: ${submittedInterest}`,
+      '',
+      String(data.get('message') ?? ''),
+    ].join('\n');
+    const recipient = form.dataset.recipient ?? '';
+    window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    if (status) status.textContent = `Your email app should open now. If it doesn’t, email us directly at ${recipient}.`;
+  });
+</script>
+
+<style>
+  .contact-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.75fr); gap: clamp(56px, 8vw, 110px); align-items: start; }
+  .contact-form-intro { max-width: 560px; margin-top: 22px; color: var(--muted); font-size: 0.86rem; }
+  .selected-context { display: flex; align-items: flex-start; gap: 10px; margin-top: 26px; padding: 16px 18px; background: rgb(217 255 67 / 0.25); font-size: 0.76rem; }
+  .selected-context[hidden] { display: none; }
+  .selected-context .icon { flex: 0 0 auto; color: #5b7300; }
+  .contact-form { display: grid; gap: 22px; margin-top: 38px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .form-field label span { color: var(--muted); font-weight: 500; text-transform: none; }
+  .contact-submit { display: flex; align-items: center; gap: 20px; margin-top: 4px; }
+  .contact-submit > p { max-width: 270px; color: var(--muted); font-size: 0.63rem; line-height: 1.6; }
+  .form-status { color: #4d6300; font-size: 0.72rem; }
+  .form-status:empty { display: none; }
+  .form-status a { text-decoration: underline; }
+  .contact-aside { background: var(--ink); color: var(--white); }
+  .contact-image { position: relative; aspect-ratio: 1.35; }
+  .contact-image img { width: 100%; height: 100%; object-fit: cover; }
+  .contact-image > span { position: absolute; bottom: 0; left: 0; padding: 16px 20px; background: var(--lime); color: var(--ink); font-family: var(--display); font-size: 1.6rem; font-weight: 700; text-transform: uppercase; }
+  .contact-details { display: grid; gap: 28px; padding: clamp(26px, 3vw, 38px); }
+  .contact-detail { display: grid; grid-template-columns: 28px 1fr; gap: 16px; }
+  .contact-detail > .icon { margin-top: 2px; color: var(--lime); }
+  .contact-detail h3 { margin-bottom: 13px; color: var(--muted-dark); font-family: var(--body); font-size: 0.62rem; font-weight: 800; letter-spacing: 0.1em; }
+  .contact-detail a { display: block; max-width: 280px; margin-bottom: 6px; color: #e2e5dc; font-size: 0.76rem; }
+  .contact-detail a:hover { color: var(--lime); }
+  .contact-detail .directions-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 9px; color: var(--lime); font-size: 0.62rem; font-weight: 800; text-transform: uppercase; }
+  .hours-row { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; color: var(--muted-dark); font-size: 0.65rem; }
+  .hours-row strong { color: #e2e5dc; font-weight: 600; }
+  .access-note { margin-top: 10px; color: var(--lime); font-size: 0.62rem; }
+  .faq-grid { display: grid; grid-template-columns: 0.65fr 1fr; align-items: start; gap: clamp(56px, 8vw, 110px); }
+  .faq-grid > div:first-child > p:not(.eyebrow) { max-width: 360px; margin-top: 24px; color: var(--muted); font-size: 0.82rem; }
+  @media (max-width: 1000px) {
+    .contact-grid { grid-template-columns: 1fr; }
+    .contact-aside { display: grid; grid-template-columns: 0.85fr 1fr; }
+    .contact-image { height: 100%; aspect-ratio: auto; }
+  }
+  @media (max-width: 700px) {
+    .form-row { grid-template-columns: 1fr; }
+    .contact-submit { align-items: flex-start; flex-direction: column; }
+    .contact-submit .button { width: 100%; }
+    .contact-aside { display: block; }
+    .contact-image { aspect-ratio: 1.3; }
+    .faq-grid { grid-template-columns: 1fr; gap: 40px; }
+  }
+</style>

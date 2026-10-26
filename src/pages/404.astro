@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+---
+<BaseLayout title="Page not found" description="This page is off the training plan. Find your way back to FORGE Athletics.">
+  <PageHero eyebrow="404 · Off track" title="Wrong turn." accent="Good recovery." description="The page you were looking for has moved, changed, or never made it onto the schedule. Let’s get you back on track." />
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Choose your next move</p>
+      <div class="recovery-links">
+        <a href="/"><span>01</span><h2>Back home</h2><Icon name="arrow-up-right" size={25} /></a>
+        <a href="/schedule"><span>02</span><h2>Find a class</h2><Icon name="arrow-up-right" size={25} /></a>
+        <a href="/contact"><span>03</span><h2>Ask the team</h2><Icon name="arrow-up-right" size={25} /></a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .recovery-links { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+  .recovery-links a { position: relative; min-height: 230px; padding: 30px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); transition: background-color 180ms ease; }
+  .recovery-links a:hover { background: var(--lime); }
+  .recovery-links a > span { color: var(--muted); font-size: 0.65rem; font-weight: 800; }
+  .recovery-links h2 { margin-top: 64px; font-size: clamp(2rem, 3.5vw, 3rem); }
+  .recovery-links .icon { position: absolute; right: 26px; bottom: 26px; }
+  @media (max-width: 700px) {
+    .recovery-links { grid-template-columns: 1fr; }
+    .recovery-links a { min-height: 170px; }
+    .recovery-links h2 { margin-top: 36px; }
+  }
+</style>
