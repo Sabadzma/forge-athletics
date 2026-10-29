@@ -28,10 +28,8 @@ export default defineConfig({
     conlocaCloud({
       endpoint: 'https://app.conloca.com',
       puckConfigPath: './src/puck.config.tsx',
-      publicBaseUrl: 'https://forge-athletics-eight-roan.vercel.app',
       siteStyles: './src/styles/global.css',
       previewBuild: false,
-      requireRegistration: true,
     }),
   ],
 });

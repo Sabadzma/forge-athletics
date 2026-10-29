@@ -37,7 +37,7 @@ bun run preview  # Serve the production build locally
 
 `src/data/gym.ts` currently holds the site's typed dummy content. Reusable view fragments live in `src/components`; route-specific composition lives in `src/pages`.
 
-Conloca `0.2.1` is configured for local editing at `/__cms`. The integration uses `content/` as its content root, `src/puck.config.tsx` for the editor palette, `src/schemas.ts` for structured content, and `public/images` for the Media Library. The local editor and all 14 existing media assets have been verified.
+Conloca `0.2.3` is configured for local editing at `/__cms`. The integration uses `content/` as its content root, `src/puck.config.tsx` for the editor palette, `src/schemas.ts` for structured content, and `public/images` for the Media Library. The local editor and all 14 existing media assets have been verified.
 
 The intended content mapping is:
 
@@ -45,7 +45,7 @@ The intended content mapping is:
 - **Data collections:** services, trainers, membership plans, journal articles, classes, schedules, and recurring metrics.
 - **Media:** photography stored in `public/images` and managed through the Media Library.
 
-Hosted Conloca Cloud is configured for `https://app.conloca.com` and the production deployment at `https://forge-athletics-eight-roan.vercel.app`. Registration runs only on pushed CI/Vercel builds with `CONLOCA_BUILD_TOKEN` configured. Local development does not require the token; local production builds do because `requireRegistration` is enabled.
+Hosted Conloca Cloud is configured for `https://app.conloca.com`. The production domain is registered in `content/sites.json`, and production builds generate the hosted editor at `/_conloca/editor/` without a build token.
 
 ## Forms and scheduling
 

@@ -4,7 +4,10 @@
       "locales": [
         "en"
       ],
-      "defaultLocale": "en"
+      "defaultLocale": "en",
+      "domains": {
+        "en": "forge-athletics-eight-roan.vercel.app"
+      }
     }
   },
   "globalLocales": [

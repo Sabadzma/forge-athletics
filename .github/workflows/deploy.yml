@@ -18,11 +18,6 @@ jobs:
           node-version: 24
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
-      # The token goes to doctor and the build only, not install or deploy steps.
       - run: bunx @conloca/cli doctor
-        env:
-          CONLOCA_BUILD_TOKEN: ${{ secrets.CONLOCA_BUILD_TOKEN }}
       - run: bun run build
-        env:
-          CONLOCA_BUILD_TOKEN: ${{ secrets.CONLOCA_BUILD_TOKEN }}
       # Vercel deploys the same pushed commit through its Git integration.
